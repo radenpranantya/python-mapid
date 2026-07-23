@@ -22,7 +22,7 @@ Manual Trigger → Set Variables → HTTP Request (MAPID API)
 
 ## Prerequisites
 
-- n8n instance (shared self-hosted recommended for cohort)
+- n8n instance (shared self-hosted recommended for cohort) — install locally via [`../../docs/install_n8n_npm.md`](../../docs/install_n8n_npm.md)
 - Python environment with module dependencies installed
 - `pipeline.py` and `config.yaml` in `session-02-automation/`
 - MAPID API bearer token

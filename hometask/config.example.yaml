@@ -1,0 +1,10 @@
+api:
+  base_url: https://api.mapid.example/v1
+  layer_id: YOUR_ASSIGNED_LAYER_ID
+  page_size: 100
+  use_cached: false
+  cached_file: data/sample_batch_response.json
+
+output:
+  dir: ./output
+  target_crs: EPSG:32748
