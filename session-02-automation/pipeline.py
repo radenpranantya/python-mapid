@@ -12,8 +12,10 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-import requests
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from mapid_client import fetch_all_features, get_api_key, get_project_id
 
 logger = logging.getLogger(__name__)
 
@@ -42,37 +44,6 @@ def setup_logging(output_dir: Path) -> None:
         ],
         force=True,
     )
-
-
-def fetch_all_features(
-    base_url: str,
-    layer_id: str,
-    headers: dict,
-    page_size: int = 100,
-) -> list:
-    all_features = []
-    offset = 0
-
-    while True:
-        url = f"{base_url.rstrip('/')}/layers/{layer_id}/features"
-        params = {"limit": page_size, "offset": offset}
-
-        logger.info("Fetching offset=%d limit=%d", offset, page_size)
-        resp = requests.get(url, headers=headers, params=params, timeout=30)
-        resp.raise_for_status()
-
-        batch = resp.json().get("features", [])
-        if not batch:
-            break
-
-        all_features.extend(batch)
-        logger.info("Received %d features (total so far: %d)", len(batch), len(all_features))
-
-        if len(batch) < page_size:
-            break
-        offset += page_size
-
-    return all_features
 
 
 def load_cached_features(cached_file: Path) -> list:
@@ -145,20 +116,21 @@ def run_pipeline(config: dict) -> gpd.GeoDataFrame:
         cached_file = Path(api_cfg["cached_file"])
         features = load_cached_features(cached_file)
     else:
-        token = os.environ.get("MAPID_API_TOKEN", "")
-        if not token:
-            raise EnvironmentError("MAPID_API_TOKEN is required when use_cached is false")
+        api_key = get_api_key()
+        project_id = api_cfg.get("project_id") or get_project_id()
+        if not api_key:
+            raise EnvironmentError("MAPID_API_KEY is required when use_cached is false")
+        if not project_id:
+            raise EnvironmentError("MAPID_PROJECT_ID is required when use_cached is false")
 
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json",
-        }
         features = fetch_all_features(
             api_cfg["base_url"],
+            api_key,
+            project_id,
             api_cfg["layer_id"],
-            headers,
             page_size=api_cfg.get("page_size", 100),
         )
+        logger.info("Fetched %d features from MAPID API", len(features))
 
     gdf = features_to_gdf(features)
     gdf = process_gdf(gdf, target_crs)

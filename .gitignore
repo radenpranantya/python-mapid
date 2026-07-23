@@ -17,3 +17,4 @@ __pycache__/
 *.json
 docs/
 .DS_Store
+.venv/

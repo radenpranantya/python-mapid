@@ -36,10 +36,11 @@ python pipeline.py --config config.yaml
 
 ```bash
 cp config.example.yaml config.yaml
-export MAPID_API_TOKEN=your_token
+export MAPID_API_KEY=your_api_key
+export MAPID_PROJECT_ID=your_project_id
 ```
 
-Set `use_cached: false` and your assigned `layer_id` for submission.
+Set `use_cached: false`, your assigned `layer_id`, and `project_id` in `config.yaml` for submission.
 
 ### Output schema — `summary.csv`
 

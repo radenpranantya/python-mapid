@@ -15,7 +15,6 @@ import sys
 from pathlib import Path
 
 import geopandas as gpd
-import requests
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -39,19 +38,24 @@ def setup_logging(output_dir: Path) -> None:
     )
 
 
-def fetch_all_features(base_url: str, layer_id: str, headers: dict, page_size: int = 100) -> list:
-    """TODO: Implement paginated fetch from MAPID API.
+def fetch_all_features(
+    base_url: str,
+    api_key: str,
+    project_id: str,
+    layer_id: str,
+    page_size: int = 100,
+) -> list:
+    """TODO: Fetch polygon features from MAPID GeoServer API.
 
-    Hint:
-    - Loop with offset += page_size
-    - Break when batch is empty
-    - Extend all_features list each iteration
+    Hint (see docs/mapid_api_contract.md):
+    - GET {base_url}/layers_new/get_layer_data_list
+    - Query params: api_key, project_id, layer_id
+    - Normalize response to GeoJSON features (or import mapid_client.fetch_all_features)
     """
     all_features = []
-    offset = 0
 
-    # TODO: Write pagination loop here
-    raise NotImplementedError("Implement fetch_all_features pagination loop")
+    # TODO: Call MAPID GeoServer and return a list of GeoJSON features
+    raise NotImplementedError("Implement fetch_all_features for MAPID GeoServer")
 
 
 def load_cached_features(cached_file: Path) -> list:
@@ -107,12 +111,13 @@ def run_pipeline(config: dict) -> gpd.GeoDataFrame:
     if api_cfg.get("use_cached", False):
         features = load_cached_features(Path(api_cfg["cached_file"]))
     else:
-        token = os.environ["MAPID_API_TOKEN"]
-        headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+        api_key = os.environ["MAPID_API_KEY"]
+        project_id = api_cfg["project_id"]
         features = fetch_all_features(
             api_cfg["base_url"],
+            api_key,
+            project_id,
             api_cfg["layer_id"],
-            headers,
             page_size=api_cfg.get("page_size", 100),
         )
 

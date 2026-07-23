@@ -1,5 +1,6 @@
 api:
-  base_url: https://api.mapid.example/v1
+  base_url: https://geoserver.mapid.io
+  project_id: your-project-id
   layer_id: YOUR_ASSIGNED_LAYER_ID
   page_size: 100
   use_cached: false

@@ -15,6 +15,8 @@ Mixed beginner to mid-level mentees. No senior track.
 
 See agendas: [`docs/session01_agenda.md`](docs/session01_agenda.md), [`docs/session02_agenda.md`](docs/session02_agenda.md).
 
+Session 1 live API run guide: [`docs/session01_run_guide.md`](docs/session01_run_guide.md).
+
 ## Pre-session setup (mentees)
 
 ### 1. Python environment
@@ -29,7 +31,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env with your MAPID_API_TOKEN and MAPID_BASE_URL
+# Edit .env with MAPID_API_KEY, MAPID_PROJECT_ID, and MAPID_LAYER_ID
 ```
 
 ### 3. Verify install
@@ -63,11 +65,11 @@ Hands-on guide: [`docs/session02_n8n_hands_on.md`](docs/session02_n8n_hands_on.m
 
 ## API contract
 
-The module uses a **placeholder** MAPID API contract. Replace with real endpoints when available:
+MAPID GeoServer API contract and env vars:
 
 [`docs/mapid_api_contract.md`](docs/mapid_api_contract.md)
 
-All code reads from `config.yaml` + environment variables so swapping endpoints is config-only.
+Shared client: [`mapid_client.py`](mapid_client.py). Session 1 notebook and Session 2 pipeline read from `config.yaml` + environment variables.
 
 ## Offline fallback
 

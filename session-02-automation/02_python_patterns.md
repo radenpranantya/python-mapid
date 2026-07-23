@@ -6,7 +6,8 @@ Use `config.yaml` + environment variables:
 
 ```yaml
 api:
-  base_url: https://api.mapid.example/v1
+  base_url: https://geoserver.mapid.io
+  project_id: your-project-id
   layer_id: your-layer-id
   page_size: 100
   use_cached: false
@@ -19,29 +20,36 @@ output:
 
 ```python
 import os
-token = os.environ["MAPID_API_TOKEN"]
+api_key = os.environ["MAPID_API_KEY"]
+project_id = os.environ["MAPID_PROJECT_ID"]
 ```
 
-## Pattern 2: Paginated API fetch
+## Pattern 2: MAPID GeoServer fetch
 
 ```python
-def fetch_all_features(base_url, layer_id, headers, page_size=100):
-    all_features = []
-    offset = 0
-    while True:
-        resp = requests.get(
-            f"{base_url}/layers/{layer_id}/features",
-            headers=headers,
-            params={"limit": page_size, "offset": offset},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        batch = resp.json()["features"]
-        if not batch:
-            break
-        all_features.extend(batch)
-        offset += page_size
-    return all_features
+from mapid_client import fetch_all_features
+
+features = fetch_all_features(
+    base_url="https://geoserver.mapid.io",
+    api_key=api_key,
+    project_id=project_id,
+    layer_id=config["api"]["layer_id"],
+)
+```
+
+Or implement manually:
+
+```python
+def fetch_all_features(base_url, api_key, project_id, layer_id):
+    resp = requests.get(
+        f"{base_url.rstrip('/')}/layers_new/get_layer_data_list",
+        params={"api_key": api_key, "project_id": project_id, "layer_id": layer_id},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    # Normalize to GeoJSON features — see mapid_client.normalize_to_feature_collection
+    return data["features"]
 ```
 
 ## Pattern 3: Pure processing pipeline
